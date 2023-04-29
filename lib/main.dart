@@ -1,8 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 
 const title = 'Stripe Payment Example';
+const kPublishableKey =
+    'pk_test_51N2GkDBqnqSB75ZASvwxTMNXRHgN1h3wouCsOvN0MkcQrE8h2YZE940CSbD57z3fKvjfvehz4tTlZlrYk5V3vXUF00MLO3vBMR';
 
-void main() => runApp(const App());
+void main() {
+  // Initialize Flutter Binding
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Assign publishable key to flutter stripe
+  Stripe.publishableKey = kPublishableKey;
+
+  runApp(const App());
+}
 
 class App extends StatelessWidget {
   const App({super.key});
