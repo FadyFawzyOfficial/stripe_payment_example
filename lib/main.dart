@@ -117,11 +117,46 @@ class _HomeState extends State<Home> {
   displayPaymentSheet() async {
     try {
       await Stripe.instance.presentPaymentSheet().then((value) {
+        showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: const [
+                Icon(
+                  Icons.check_circle,
+                  color: Colors.green,
+                  size: 100,
+                ),
+                SizedBox(height: 16),
+                Text('Payment Successful!'),
+              ],
+            ),
+          ),
+        );
         // Clear paymentIntent variable after successful payment.
         paymentIntent = null;
       }).onError((error, stackTrace) => throw Exception(e));
     } on StripeException catch (e) {
       print('Error is: ---> $e');
+      AlertDialog(
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              children: const [
+                Icon(
+                  Icons.cancel,
+                  color: Colors.red,
+                  size: 100,
+                ),
+                SizedBox(height: 16),
+                Text('Payment Failed'),
+              ],
+            ),
+          ],
+        ),
+      );
     } catch (e) {
       print('$e');
     }
