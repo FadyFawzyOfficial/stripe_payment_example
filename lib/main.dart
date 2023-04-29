@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
@@ -33,8 +34,15 @@ class App extends StatelessWidget {
   }
 }
 
-class Home extends StatelessWidget {
+class Home extends StatefulWidget {
   const Home({super.key});
+
+  @override
+  State<Home> createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
+  Map<String, dynamic>? paymentIntent;
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +55,7 @@ class Home extends StatelessWidget {
   Future<void> makePayment() async {
     try {
       // STEP 1: Create Payment Intent
-      final paymentIntent = await createPaymentIntent('100', 'USD');
+      paymentIntent = await createPaymentIntent('100', 'USD');
 
       // STEP 2: Initialize Payment Sheet
       //* we initialize a payment sheet. This will be used to create the payment
@@ -58,12 +66,15 @@ class Home extends StatelessWidget {
       await Stripe.instance
           .initPaymentSheet(
             paymentSheetParameters: SetupPaymentSheetParameters(
-                paymentIntentClientSecret: paymentIntent[
+                paymentIntentClientSecret: paymentIntent![
                     'client_secret'], // Gotten from payment intent
                 style: ThemeMode.light,
                 merchantDisplayName: 'Fady'),
           )
           .then((value) {});
+
+      // STEP 3: Display Payment Sheet
+      displayPaymentSheet();
     } catch (e) {
       throw Exception(e);
     }
@@ -98,6 +109,21 @@ class Home extends StatelessWidget {
       return json.decode(response.body);
     } catch (e) {
       throw Exception('$e');
+    }
+  }
+
+  // STEP 3: Display Payment Sheet
+  //* The final step is to display the modal sheet.
+  displayPaymentSheet() async {
+    try {
+      await Stripe.instance.presentPaymentSheet().then((value) {
+        // Clear paymentIntent variable after successful payment.
+        paymentIntent = null;
+      }).onError((error, stackTrace) => throw Exception(e));
+    } on StripeException catch (e) {
+      print('Error is: ---> $e');
+    } catch (e) {
+      print('$e');
     }
   }
 
