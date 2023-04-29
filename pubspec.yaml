@@ -35,6 +35,10 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   # Fady Fawzy Comment: Flutter Version is 3.7.10
   cupertino_icons: ^1.0.5
+  # A composable, multi-platform, Future-based API for HTTP requests.
+  http: ^0.13.5
+  # Flutter library for Stripe. Supports PaymentSheets, Apple & Google Pay, SCA, PSD2 and much more.
+  flutter_stripe: ^9.1.1
 
 dev_dependencies:
   flutter_test:
