@@ -48,6 +48,22 @@ class Home extends StatelessWidget {
     try {
       // STEP 1: Create Payment Intent
       final paymentIntent = await createPaymentIntent('100', 'USD');
+
+      // STEP 2: Initialize Payment Sheet
+      //* we initialize a payment sheet. This will be used to create the payment
+      //* sheet modal where we will fill in our card details and pay.
+      //* We pass in the client_secret obtained from the payment intent from the
+      //* previous step. You have access to a range of parameters here including
+      //* style which allows us to select the dark theme!
+      await Stripe.instance
+          .initPaymentSheet(
+            paymentSheetParameters: SetupPaymentSheetParameters(
+                paymentIntentClientSecret: paymentIntent[
+                    'client_secret'], // Gotten from payment intent
+                style: ThemeMode.light,
+                merchantDisplayName: 'Fady'),
+          )
+          .then((value) {});
     } catch (e) {
       throw Exception(e);
     }
@@ -78,6 +94,7 @@ class Home extends StatelessWidget {
         body: body,
       );
 
+      print(response.body);
       return json.decode(response.body);
     } catch (e) {
       throw Exception('$e');
