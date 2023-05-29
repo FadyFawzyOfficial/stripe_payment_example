@@ -61,6 +61,7 @@ class _HomeState extends State<Home> {
     try {
       // STEP 1: Create Payment Intent
       paymentIntent = await createPaymentIntent('100', 'USD');
+      debugPrint('$paymentIntent');
 
       // STEP 2: Initialize Payment Sheet
       //* we initialize a payment sheet. This will be used to create the payment
@@ -71,10 +72,15 @@ class _HomeState extends State<Home> {
       await Stripe.instance
           .initPaymentSheet(
             paymentSheetParameters: SetupPaymentSheetParameters(
-                paymentIntentClientSecret: paymentIntent![
-                    'client_secret'], // Gotten from payment intent
-                style: ThemeMode.light,
-                merchantDisplayName: 'Fady'),
+              paymentIntentClientSecret:
+                  paymentIntent!['client_secret'], // Gotten from payment intent
+              style: ThemeMode.light,
+              customerId: paymentIntent!['customer'],
+              merchantDisplayName: 'Fady',
+              // applePay: const PaymentSheetApplePay(
+              //   merchantCountryCode: 'US',
+              // ),
+            ),
           )
           .then((value) {});
 
@@ -102,7 +108,7 @@ class _HomeState extends State<Home> {
 
     try {
       final response = await post(
-        Uri.parse('https://api.stripe.com/v1/paymnet_intents'),
+        Uri.parse('https://api.stripe.com/v1/payment_intents'),
         headers: {
           'Authorization': 'Bearer $kSecretKey',
           'content-type': 'application/x-www-form-urlencoded',
@@ -110,7 +116,7 @@ class _HomeState extends State<Home> {
         body: body,
       );
 
-      print(response.body);
+      debugPrint(response.body);
       return json.decode(response.body);
     } catch (e) {
       throw Exception('$e');
@@ -143,7 +149,7 @@ class _HomeState extends State<Home> {
         paymentIntent = null;
       }).onError((error, stackTrace) => throw Exception(e));
     } on StripeException catch (e) {
-      print('Error is: ---> $e');
+      debugPrint('Error is: ---> $e');
       AlertDialog(
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -163,7 +169,7 @@ class _HomeState extends State<Home> {
         ),
       );
     } catch (e) {
-      print('$e');
+      debugPrint('$e');
     }
   }
 
